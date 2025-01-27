@@ -11,7 +11,7 @@ def validate_inputs(exe_path: str, start_time: str, stop_time: str) -> bool:
     """
     # Check if executable path is provided
     if not exe_path:
-        raise ValidationError("Please select an executable file.")
+        raise FileNotFoundError("Please select an executable file.")
         
     # Check if executable exists
     if not Path(exe_path).exists():
