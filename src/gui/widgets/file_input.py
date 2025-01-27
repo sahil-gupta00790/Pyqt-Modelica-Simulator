@@ -88,7 +88,7 @@ class FileInput(QWidget):
             while current.name != 'src':
                 current = current.parent
             current=current.parent
-            return os.path.join(current,'model','executables')
+            return os.path.join(current,'model','executables','TwoConnectedTanks.exe')
         return self.file_input.text()
 
     def is_default(self) -> bool:
