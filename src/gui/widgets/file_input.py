@@ -8,10 +8,12 @@ from PyQt6.QtWidgets import (
     QGroupBox,
     QFileDialog,
     QMessageBox,
+    QCheckBox,
 )
 from PyQt6.QtCore import Qt
 from ..styles import get_dark_theme_style, get_button_style
 import os
+from pathlib import Path
 
 
 class FileInput(QWidget):
@@ -23,7 +25,6 @@ class FileInput(QWidget):
 
     def setup_ui(self):
         """Initialize the UI components."""
-
         self.box = QGroupBox()
         self.box.setStyleSheet(get_dark_theme_style())
 
@@ -34,13 +35,6 @@ class FileInput(QWidget):
         # Label
         label = QLabel("Select Executable")
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        label.setStyleSheet("""
-            QLabel {
-                color: #ffffff;
-                font-size: 14px;
-                margin-bottom: 5px;
-            }
-        """)
 
         # Input and button layout
         input_layout = QHBoxLayout()
@@ -59,8 +53,12 @@ class FileInput(QWidget):
         input_layout.addWidget(self.file_input)
         input_layout.addWidget(browse_button)
 
+        # Add checkbox
+        self.default_checkbox = QCheckBox("Default(Inbuilt Model)")
+
         layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addLayout(input_layout)
+        layout.addWidget(self.default_checkbox, alignment=Qt.AlignmentFlag.AlignLeft)
         self.box.setLayout(layout)
 
         main_layout = QVBoxLayout()
@@ -72,26 +70,33 @@ class FileInput(QWidget):
         user_home_directory = os.path.expanduser("~")
         username = os.path.basename(user_home_directory)
     
-        
         specific_path = os.path.join(user_home_directory, "AppData", "Local", "Temp", "OpenModelica", "OMEdit", "NonInteractingTanks.TwoConnectedTanks")
 
         filename, _ = QFileDialog.getOpenFileName(
-        self,
-        "Select Executable",
-        specific_path,  
-        "Executable files (*.exe);;All files (*.*)"
-    )
+            self,
+            "Select Executable",
+            specific_path,  
+            "Executable files (*.exe);;All files (*.*)"
+        )
         if filename:
             self.file_input.setText(filename)
 
     def get_file_path(self) -> str:
         """Return the selected file path."""
-
+        if self.is_default():
+            current = Path(__file__).resolve()
+            while current.name != 'src':
+                current = current.parent
+            current=current.parent
+            return os.path.join(current,'model','Executable')
         return self.file_input.text()
+
+    def is_default(self) -> bool:
+        """Return whether the default checkbox is checked."""
+        return self.default_checkbox.isChecked()
 
     def show_error_dialog(self, message: str):
         """Display error message dialog."""
-
         error_dialog = QMessageBox(self)
         error_dialog.setIcon(QMessageBox.Icon.Critical)
         error_dialog.setWindowTitle("Error")

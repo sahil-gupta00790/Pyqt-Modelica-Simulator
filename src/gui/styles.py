@@ -43,6 +43,31 @@ def get_dark_theme_style() -> str:
         color: #ffffff;
         selection-background-color: #0078d4;
     }
+    QCheckBox {
+        color: #ffffff;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    QCheckBox::indicator {
+        width: 15px;
+        height: 15px;
+        border-radius: 3px;
+    }
+    QCheckBox::indicator:unchecked {
+        background-color: #383838;
+        border: 1px solid #3d3d3d;
+    }
+    QCheckBox::indicator:unchecked:hover {
+        border: 1px solid #0078d4;
+    }
+    QCheckBox::indicator:checked {
+        background-color: #0078d4;
+        border: 1px solid #0078d4;
+    }
+    QCheckBox::indicator:checked:hover {
+        background-color: #1484d7;
+        border: 1px solid #1484d7;
+    }
     """
 
 
@@ -66,4 +91,3 @@ def get_button_style() -> str:
         background-color: #006cbd;
     }
     """
-
