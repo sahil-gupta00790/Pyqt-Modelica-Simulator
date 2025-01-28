@@ -62,10 +62,13 @@ class InputPage(QWidget):
             start_time = self.start_time.get_value()
             stop_time = self.stop_time.get_value()
             output_format = self.format_selector.get_selected_format()
-            
+            is_default = self.file_input.default_checkbox.isChecked()
+
             if validate_inputs(exe_path, start_time, stop_time):
-                simulation_results = run_simulation(exe_path, start_time, stop_time, output_format)
-                # switching to result page
+                self.main_window.selected_format = output_format
+                self.main_window.is_default = is_default  
+                self.main_window.path=exe_path
+                run_simulation(exe_path, start_time, stop_time, output_format)
                 self.main_window.go_to_results_page()
             
         except ValidationError as e:

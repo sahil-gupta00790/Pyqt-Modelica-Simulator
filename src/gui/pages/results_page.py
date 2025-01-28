@@ -4,12 +4,16 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QLabel,
     QFileDialog,
-    QMessageBox
+    QMessageBox,
+    
 )
-from PyQt6.QtGui import QPalette, QColor
-from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPalette, QColor,QIcon
+from PyQt6.QtCore import Qt,QSize
 import os
 from pathlib import Path
+from ..widgets.format_selector import FormatSelector
+from ..widgets.file_input import FileInput
+import shutil
 
 from ..styles import (
     get_button_style,
@@ -30,7 +34,7 @@ class ResultsPage(QWidget):
         self._setup_palette()
         layout = QVBoxLayout()
         self._add_results_label(layout)
-        self._add_description_label(layout)
+        self._add_description_label(layout,"Bruh")
         self._add_download_button(layout)
         self._add_path_label(layout)
         self._add_back_button(layout)
@@ -51,8 +55,8 @@ class ResultsPage(QWidget):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-    def _add_description_label(self, layout):
-        desc_label = QLabel("Your simulation results are ready to be downloaded...")
+    def _add_description_label(self, layout,str):
+        desc_label = QLabel(str)
         desc_label.setStyleSheet(get_description_label_style())
         layout.addWidget(
             desc_label,
@@ -62,6 +66,9 @@ class ResultsPage(QWidget):
     def _add_download_button(self, layout):
         download_button = QPushButton("Download Results")
         download_button.setStyleSheet(get_download_button_style())
+        download_icon = QIcon("image.png")
+        download_button.setIconSize(QSize(24, 24))
+        download_button.setIcon(download_icon)
         download_button.clicked.connect(self.download_results)
         layout.addWidget(
             download_button,
@@ -87,8 +94,8 @@ class ResultsPage(QWidget):
         )
 
     def download_results(self):
-        output_format = self.main_window.input_page.format_selector.get_selected_format()
-        is_default = self.main_window.input_page.file_input.is_default()
+        output_format = self.main_window.selected_format
+        is_default = self.main_window.is_default
 
         if is_default:
             self._save_to_default_location(output_format)
@@ -96,51 +103,77 @@ class ResultsPage(QWidget):
             self._save_with_dialog(output_format)
 
     def _save_to_default_location(self, output_format):
-        try:
-            current = Path(__file__).resolve()
-            while current.name != 'src':
-                current = current.parent
+        current = Path(__file__).resolve()
+        while current.name != 'src':
             current = current.parent
+        current=current.parent
+        path=os.path.join(current,'model','executables')
+        if output_format== '.mat':
+            options = QFileDialog.Option.DontUseNativeDialog 
+            file_path,_=QFileDialog.getSaveFileName(
+                self,
+                "Save file as",
+                "Result.mat",
+                "MATLAB Files (*.mat)",
+                options=options
+            )
+            if file_path:
+                try:
+                    shutil.copy(os.path.join(path,"result.mat"),file_path)
+                    QMessageBox.information(self,"Success","File saved successfully")
+                except Exception as e:
+                    self._show_error(f"Failed to save file {e}")
+        else:
+            options = QFileDialog.Option.DontUseNativeDialog 
+            file_path,_=QFileDialog.getSaveFileName(
+                self,
+                "Save file as",
+                "Result.csv",
+                "CSV Files(*.csv)",
+                options=options
+            )
+        if file_path:
+            try:
+                shutil.copy(os.path.join(path,"result.csv"),file_path)
+                QMessageBox.information(self,"Success","File saved successfully")
+            except Exception as e:
+                self._show_error(f"Failed to save file {e}")
 
-            filename = f"result{output_format}"
-            save_path = os.path.join(current, filename)
-
-            simulation_data = self.main_window.simulation_results
-
-            if output_format == '.mat':
-                from scipy.io import savemat
-                savemat(save_path, {'simulation_data': simulation_data})
-            else:
-                import pandas as pd
-                pd.DataFrame(simulation_data).to_csv(save_path, index=False)
-
-            self.path_label.setText("")
-        except Exception as e:
-            self._show_error(str(e))
 
     def _save_with_dialog(self, output_format):
-        default_name = "result" + output_format
-        filename, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save Results",
-            default_name,
-            f"Results (*{output_format});;All Files (*)"
-        )
+        exe_dir = os.path.dirname(self.main_window.path)
+        if output_format== '.mat':
+            options = QFileDialog.Option.DontUseNativeDialog 
+            file_path,_=QFileDialog.getSaveFileName(
+                self,
+                "Save file as",
+                "Result.mat",
+                "MATLAB Files (*.mat)",
+                options=options
+            )
+            if file_path:
+                try:
+                    shutil.copy(os.path.join(exe_dir,"result.mat"),file_path)
+                    QMessageBox.information(self,"Success","File saved successfully")
+                except Exception as e:
+                    self._show_error(f"Failed to save file {e}")
+        else:
+            options = QFileDialog.Option.DontUseNativeDialog 
+            file_path,_=QFileDialog.getSaveFileName(
+                self,
+                "Save file as",
+                "Result.csv",
+                "CSV Files(*.csv)",
+                options=options
+            )
+            if file_path:
+                try:
+                    shutil.copy(os.path.join(exe_dir,"result.csv"),file_path)
+                    QMessageBox.information(self,"Success","File saved successfully")
+                except Exception as e:
+                    self._show_error(f"Failed to save file {e}")
 
-        if filename:
-            try:
-                simulation_data = self.main_window.simulation_results
 
-                if output_format == '.mat':
-                    from scipy.io import savemat
-                    savemat(filename, {'simulation_data': simulation_data})
-                else:
-                    import pandas as pd
-                    pd.DataFrame(simulation_data).to_csv(filename, index=False)
-
-                self.path_label.setText(f"This file is also saved in: {filename}")
-            except Exception as e:
-                self._show_error(str(e))
 
     def _show_error(self, message):
         QMessageBox.critical(self, "Error", message)

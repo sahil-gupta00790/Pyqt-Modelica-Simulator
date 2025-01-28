@@ -14,6 +14,9 @@ class MainWindow(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
         
+        self.selected_format = None 
+        self.is_default = False 
+        self.path=None
         
         self.input_page = InputPage(self)  
         self.results_page = ResultsPage(self)
