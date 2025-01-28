@@ -3,10 +3,11 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QGroupBox,
-    QDoubleSpinBox,
+    QLineEdit
 )
 from PyQt6.QtCore import Qt
 from ..styles import get_dark_theme_style
+from PyQt6.QtGui import QDoubleValidator
 
 
 class TimeInput(QWidget):
@@ -29,15 +30,18 @@ class TimeInput(QWidget):
         label = QLabel(self.label_text)
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.time_input = QDoubleSpinBox()
-        self.time_input.setRange(0, 5)
-        self.time_input.setDecimals(2)
-        self.time_input.setSingleStep(0.1)
+        self.time_input = QLineEdit()
+        validator = QDoubleValidator(0, 5, 6)
+        
+        self.time_input.setValidator(validator)
+
         self.time_input.setFixedWidth(200)
         self.time_input.setMinimumHeight(30)
         self.time_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.time_input.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
 
+        
+        self.time_input.setText("0.00")
+        self.time_input.editingFinished.connect(self._clean_trailing_zeros)
         layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.time_input, alignment=Qt.AlignmentFlag.AlignCenter)
         box.setLayout(layout)
@@ -45,7 +49,24 @@ class TimeInput(QWidget):
         main_layout = QVBoxLayout()
         main_layout.addWidget(box)
         self.setLayout(main_layout)
+    def _clean_trailing_zeros(self):
+        """Clean up trailing zeros while keeping at least 2 decimal places"""
+        try:
+            value = float(self.time_input.text())
+            text = f"{value:.6f}".rstrip('0')
+            if '.' in text:
+                decimal_places = len(text.split('.')[1])
+                if decimal_places < 2:
+                    text = f"{value:.2f}"
+            self.time_input.setText(text)
+        except ValueError:
+            pass
 
     def get_value(self) -> float:
         """Return the current time value."""
-        return self.time_input.value()
+        try:
+            return float(self.time_input.text())
+        except ValueError:
+            return 0.0
+
+    

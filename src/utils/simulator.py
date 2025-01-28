@@ -11,8 +11,7 @@ def run_simulation(exe_path: str, start_time: float, stop_time: float , output_f
         f"-override=startTime={start_time},stopTime={stop_time}",
         f"-r=result{output_format}"
     ]
-    print(output_format[1:])
     try:
         subprocess.run(cmd, check=True,cwd=Path(exe_path).parent)
     except subprocess.CalledProcessError as e:
-        raise (f"Simulation failed: {e}")
+        raise RuntimeError(f"Simulation failed: {e}")
