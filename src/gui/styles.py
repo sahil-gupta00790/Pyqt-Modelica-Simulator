@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import QApplication
 
 def get_dark_theme_style() -> str:
     """Return the dark theme stylesheet."""
-    
     return """
     QGroupBox {
         margin-top: 10px;
@@ -91,3 +90,45 @@ def get_button_style() -> str:
         background-color: #006cbd;
     }
     """
+
+
+def get_download_button_style() -> str:
+    """Return the download button stylesheet."""
+    return """
+    QPushButton {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        min-width: 120px;
+        max-width: 200px;
+    }
+    QPushButton:hover {
+        background-color: #27ae60;
+    }
+    QPushButton:pressed {
+        background-color: #219a52;
+    }
+    """
+
+
+def get_description_label_style() -> str:
+    """Return the description label stylesheet."""
+    return """
+    color: #a0a0a0;
+    font-family: 'Segoe Script', cursive;
+    font-size: 16px;
+    margin: 20px;
+    """
+
+
+def get_results_label_style() -> str:
+    """Return the results label stylesheet."""
+    return "color: white; font-size: 24px;"
+
+
+def get_path_label_style() -> str:
+    """Return the path label stylesheet."""
+    return "color: #a0a0a0; font-size: 12px;"
