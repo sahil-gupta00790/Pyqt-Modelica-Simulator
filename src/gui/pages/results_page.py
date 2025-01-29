@@ -1,179 +1,137 @@
-from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QPushButton,
-    QLabel,
-    QFileDialog,
-    QMessageBox,
-    
-)
-from PyQt6.QtGui import QPalette, QColor,QIcon
-from PyQt6.QtCore import Qt,QSize
 import os
-from pathlib import Path
-from ..widgets.format_selector import FormatSelector
-from ..widgets.file_input import FileInput
-import shutil
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from ..styles import (
-    get_button_style,
+    get_back_button_style,
+    get_dark_theme_style,
     get_download_button_style,
-    get_description_label_style,
-    get_results_label_style,
-    get_path_label_style
 )
+from utils.file_operations import FileOperations
 
 
 class ResultsPage(QWidget):
+    """Results page widget that displays simulation results and download functionality."""
+    
     def __init__(self, main_window):
+        """Initialize the results page.
+        
+        Args:
+            main_window: Parent window containing this widget.
+        """
         super().__init__()
         self.main_window = main_window
         self.setup_ui()
 
     def setup_ui(self):
-        self._setup_palette()
-        layout = QVBoxLayout()
-        self._add_results_label(layout)
-        self._add_description_label(layout,"Bruh")
-        self._add_download_button(layout)
-        self._add_path_label(layout)
-        self._add_back_button(layout)
-        layout.addStretch()
-        self.setLayout(layout)
+        """Set up the user interface components and layouts for the results page.
+        
+        Creates a centered layout with a group box containing:
+        - Results title
+        - Download button
+        - Status label
+        - Back button
+        """
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_layout.setContentsMargins(20, 20, 20, 20)
 
-    def _setup_palette(self):
-        palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor("#1a1a1a"))
-        self.setAutoFillBackground(True)
-        self.setPalette(palette)
+        self.box = QGroupBox()
+        self.box.setStyleSheet(get_dark_theme_style())
+        self.box.setMinimumWidth(500)
+        self.box.setFixedWidth(500)
+        self.box.setMaximumHeight(300)
 
-    def _add_results_label(self, layout):
+        box_layout = QVBoxLayout()
+        box_layout.setContentsMargins(20, 15, 20, 15)
+        box_layout.setSpacing(10)
+
         results_label = QLabel("Simulation Results")
-        results_label.setStyleSheet(get_results_label_style())
-        layout.addWidget(
-            results_label,
+        results_label.setStyleSheet(
+            "color: white; font-size: 24px; font-weight: bold;"
+        )
+        box_layout.addWidget(
+            results_label, 
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-    def _add_description_label(self, layout,str):
-        desc_label = QLabel(str)
-        desc_label.setStyleSheet(get_description_label_style())
-        layout.addWidget(
-            desc_label,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
-
-    def _add_download_button(self, layout):
+        box_layout.addSpacing(50)
+        
         download_button = QPushButton("Download Results")
         download_button.setStyleSheet(get_download_button_style())
-        download_icon = QIcon("image.png")
-        download_button.setIconSize(QSize(24, 24))
-        download_button.setIcon(download_icon)
         download_button.clicked.connect(self.download_results)
-        layout.addWidget(
-            download_button,
+        download_button.setMinimumHeight(30)
+        box_layout.addWidget(
+            download_button, 
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-    def _add_path_label(self, layout):
-        self.path_label = QLabel("")
-        self.path_label.setStyleSheet(get_path_label_style())
-        self.path_label.setWordWrap(True)
-        layout.addWidget(
-            self.path_label,
-            alignment=Qt.AlignmentFlag.AlignCenter
+        self.status_label = QLabel("")
+        self.status_label.setStyleSheet(
+            "color: #ffffff; "
+            "font-size: 14px; "
+            "font-family: 'Consolas', 'Courier New', monospace; "
+            "margin-top: 10px; "
+            "margin-bottom: 10px;"
         )
+        self.status_label.setWordWrap(True)
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        box_layout.addWidget(self.status_label)
 
-    def _add_back_button(self, layout):
-        back_button = QPushButton("Back to Input")
-        back_button.setStyleSheet(get_button_style())
+        box_layout.addStretch(1)
+
+        back_layout = QHBoxLayout()
+        back_layout.setContentsMargins(0, 0, 0, 0)
+        
+        back_button = QPushButton("← Back")
+        back_button.setStyleSheet(get_back_button_style())
         back_button.clicked.connect(self.main_window.go_to_input_page)
-        layout.addWidget(
-            back_button,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        back_button.setMinimumHeight(30)
+        back_button.setMinimumWidth(120)
+        
+        back_layout.addWidget(back_button)
+        back_layout.addStretch(1)
+        box_layout.addLayout(back_layout)
 
-    def download_results(self):
+        self.box.setLayout(box_layout)
+        main_layout.addWidget(self.box)
+        self.setLayout(main_layout)
+
+    def set_status_text(self, text: str) -> None:
+        """Update the status label text.
+        
+        Args:
+            text: The new text to display in the status label.
+        """
+        self.status_label.setText(text)
+
+    def download_results(self) -> None:
+        """Handle the download results action.
+        
+        Determines the appropriate file path based on whether using default or 
+        custom location, then triggers the file save operation through 
+        FileOperations utility.
+        """
         output_format = self.main_window.selected_format
         is_default = self.main_window.is_default
+        is_mat = output_format == '.mat'
 
         if is_default:
-            self._save_to_default_location(output_format)
+            save_path = FileOperations.get_default_save_path()
+            filename = "result.mat" if is_mat else "result.csv"
+            source_path = os.path.join(save_path, filename)
         else:
-            self._save_with_dialog(output_format)
+            exe_dir = os.path.dirname(self.main_window.path)
+            self.set_status_text("Results are also saved in exe directory")
+            filename = "result.mat" if is_mat else "result.csv"
+            source_path = os.path.join(exe_dir, filename)
 
-    def _save_to_default_location(self, output_format):
-        current = Path(__file__).resolve()
-        while current.name != 'src':
-            current = current.parent
-        current=current.parent
-        path=os.path.join(current,'model','executables')
-        if output_format== '.mat':
-            options = QFileDialog.Option.DontUseNativeDialog 
-            file_path,_=QFileDialog.getSaveFileName(
-                self,
-                "Save file as",
-                "Result.mat",
-                "MATLAB Files (*.mat)",
-                options=options
-            )
-            if file_path:
-                try:
-                    shutil.copy(os.path.join(path,"result.mat"),file_path)
-                    QMessageBox.information(self,"Success","File saved successfully")
-                except Exception as e:
-                    self._show_error(f"Failed to save file {e}")
-        else:
-            options = QFileDialog.Option.DontUseNativeDialog 
-            file_path,_=QFileDialog.getSaveFileName(
-                self,
-                "Save file as",
-                "Result.csv",
-                "CSV Files(*.csv)",
-                options=options
-            )
-        if file_path:
-            try:
-                shutil.copy(os.path.join(path,"result.csv"),file_path)
-                QMessageBox.information(self,"Success","File saved successfully")
-            except Exception as e:
-                self._show_error(f"Failed to save file {e}")
-
-
-    def _save_with_dialog(self, output_format):
-        exe_dir = os.path.dirname(self.main_window.path)
-        if output_format== '.mat':
-            options = QFileDialog.Option.DontUseNativeDialog 
-            file_path,_=QFileDialog.getSaveFileName(
-                self,
-                "Save file as",
-                "Result.mat",
-                "MATLAB Files (*.mat)",
-                options=options
-            )
-            if file_path:
-                try:
-                    shutil.copy(os.path.join(exe_dir,"result.mat"),file_path)
-                    QMessageBox.information(self,"Success","File saved successfully")
-                except Exception as e:
-                    self._show_error(f"Failed to save file {e}")
-        else:
-            options = QFileDialog.Option.DontUseNativeDialog 
-            file_path,_=QFileDialog.getSaveFileName(
-                self,
-                "Save file as",
-                "Result.csv",
-                "CSV Files(*.csv)",
-                options=options
-            )
-            if file_path:
-                try:
-                    shutil.copy(os.path.join(exe_dir,"result.csv"),file_path)
-                    QMessageBox.information(self,"Success","File saved successfully")
-                except Exception as e:
-                    self._show_error(f"Failed to save file {e}")
-
-
-
-    def _show_error(self, message):
-        QMessageBox.critical(self, "Error", message)
+        FileOperations.save_result_file(self, source_path, is_mat)

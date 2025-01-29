@@ -132,3 +132,25 @@ def get_results_label_style() -> str:
 def get_path_label_style() -> str:
     """Return the path label stylesheet."""
     return "color: #a0a0a0; font-size: 12px;"
+
+def get_back_button_style() -> str:
+    """Return the back button stylesheet."""
+    return """
+    QPushButton {
+        background-color: #2d2d2d;
+        color: #a0a0a0;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        text-align: left;
+        min-width: 120px;
+    }
+    QPushButton:hover {
+        color: #ffffff;
+        background-color: #353535;
+    }
+    QPushButton:pressed {
+        background-color: #404040;
+    }
+    """
