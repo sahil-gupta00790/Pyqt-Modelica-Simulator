@@ -8,7 +8,7 @@ from ..widgets.format_selector import FormatSelector
 from ..styles import get_button_style
 from utils.simulator import run_simulation
 from utils.validator import ValidationError, validate_inputs
-
+from ..widgets.loading import run_simulation_with_loading
 class InputPage(QWidget):
     def __init__(self, main_window):
         super().__init__()
@@ -68,7 +68,7 @@ class InputPage(QWidget):
                 self.main_window.selected_format = output_format
                 self.main_window.is_default = is_default  
                 self.main_window.path=exe_path
-                run_simulation(exe_path, start_time, stop_time, output_format)
+                run_simulation_with_loading(exe_path, start_time, stop_time, output_format)
                 self.main_window.go_to_results_page()
             
         except ValidationError as e:
