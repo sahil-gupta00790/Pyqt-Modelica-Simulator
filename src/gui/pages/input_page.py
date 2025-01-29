@@ -8,7 +8,7 @@ from ..widgets.format_selector import FormatSelector
 from ..styles import get_button_style
 from utils.simulator import run_simulation
 from utils.validator import ValidationError, validate_inputs
-from ..widgets.loading import run_simulation_with_loading
+from ..widgets.simulationWorker import SimulationWorker
 class InputPage(QWidget):
     def __init__(self, main_window):
         super().__init__()
@@ -66,10 +66,16 @@ class InputPage(QWidget):
 
             if validate_inputs(exe_path, start_time, stop_time):
                 self.main_window.selected_format = output_format
-                self.main_window.is_default = is_default  
-                self.main_window.path=exe_path
-                run_simulation_with_loading(exe_path, start_time, stop_time, output_format)
-                self.main_window.go_to_results_page()
+                self.main_window.is_default = is_default
+                self.main_window.path = exe_path
+
+                # Setting a worker , to run on background thread
+                worker = SimulationWorker(exe_path, start_time, stop_time, output_format)
+                worker.finished.connect(self.main_window.go_to_results_page)
+                worker.error.connect(lambda e: print(f"Error: {e}"))  # Handle error as needed
+
+                #starting worker
+                worker.start()
             
         except ValidationError as e:
             self.file_input.show_error_dialog(str(e))
