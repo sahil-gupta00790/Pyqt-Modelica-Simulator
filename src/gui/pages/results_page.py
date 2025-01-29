@@ -63,7 +63,7 @@ class ResultsPage(QWidget):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-        box_layout.addSpacing(50)
+        
         
         download_button = QPushButton("Download Results")
         download_button.setStyleSheet(get_download_button_style())
@@ -130,7 +130,7 @@ class ResultsPage(QWidget):
             source_path = os.path.join(save_path, filename)
         else:
             exe_dir = os.path.dirname(self.main_window.path)
-            self.set_status_text("Results are also saved in exe directory")
+            
             filename = "result.mat" if is_mat else "result.csv"
             source_path = os.path.join(exe_dir, filename)
 

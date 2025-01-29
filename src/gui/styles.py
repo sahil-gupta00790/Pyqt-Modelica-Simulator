@@ -138,7 +138,7 @@ def get_back_button_style() -> str:
     return """
     QPushButton {
         background-color: #2d2d2d;
-        color: #a0a0a0;
+        
         border: none;
         padding: 10px 20px;
         border-radius: 5px;

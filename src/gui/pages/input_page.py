@@ -68,14 +68,15 @@ class InputPage(QWidget):
                 self.main_window.selected_format = output_format
                 self.main_window.is_default = is_default
                 self.main_window.path = exe_path
+                
 
                 # Setting a worker , to run on background thread
-                worker = SimulationWorker(exe_path, start_time, stop_time, output_format)
-                worker.finished.connect(self.main_window.go_to_results_page)
-                worker.error.connect(lambda e: print(f"Error: {e}"))  # Handle error as needed
+                self.worker = SimulationWorker(exe_path, start_time, stop_time, output_format)
+                self.worker.finished.connect(self.main_window.go_to_results_page)
+                self.worker.error.connect(lambda e: print(f"Error: {e}"))  # Handle error as needed
 
                 #starting worker
-                worker.start()
+                self.worker.start()
             
         except ValidationError as e:
             self.file_input.show_error_dialog(str(e))
