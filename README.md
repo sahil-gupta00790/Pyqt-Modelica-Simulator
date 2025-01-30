@@ -64,17 +64,16 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### 2.Using the interface
+### 2.Using the interface 
+-Click "Browse" to select your OpenModelica Executable, or choose the inbuilt TwoConnectedTanks model by checking the default button 
 
--Click "Browse" to select your OpenModelica Executable, or choose the inbuilt TwoConnectedTanks model by checking the default button
+-Enter Start and Stop Time(0<=Start time<Stop time<5>) 
 
--Enter Start and Stop Time(0<=Start time<Stop time<5>)
+-Additionally, you can choose whether you want '.mat' or '.csv' file as output 
 
--Additionally, you can choose whether you want '.mat' or '.csv' file as output
+-Click on "Execute Simulation" to execute 
 
--Click on "Execute Simulation" to execute
-
--You can also download the result in the directory you wish
+-You can also download the result in the directory you wish 
 
 
 ## Project Structure
@@ -110,13 +109,13 @@ The application is built using Object-Oriented Programming Principles:
 
 ### Common Issues
 
-1.OpenModelica Executable Not Found:
--Ensure the executable path is correct
--Check file permissions
+1.OpenModelica Executable Not Found: 
+-Ensure the executable path is correct 
+-Check file permissions 
 
-2.Simulation Error
--Check for OpenModelica installlation
--Add Path to OpenModelica's bin to environment variables
+2.Simulation Error 
+-Check for OpenModelica installlation 
+-Add Path to OpenModelica's bin to environment variables 
 
 ---
 Developed as part of the FOSSEE screening task
