@@ -22,7 +22,7 @@ A Python based desktop application for executing Openmodelica simulations. This 
   - [OOP Implementation](#oop-implementation)
 - [Troubleshooting](#troubleshooting)
   - [Common Issues](#common-issues)
-  
+
 ## Features
 
 - File selection for OpenModelica executables
@@ -66,14 +66,19 @@ python main.py
 
 ### 2.Using the interface
 
--Click "Browse" to select your OpenModelica Executable, or choose the inbuilt TwoConnectedTanks model by checking the default button.
+-Click "Browse" to select your OpenModelica Executable, or choose the inbuilt TwoConnectedTanks model by checking the default button
+
 -Enter Start and Stop Time(0<=Start time<Stop time<5>)
+
 -Additionally, you can choose whether you want '.mat' or '.csv' file as output
+
 -Click on "Execute Simulation" to execute
+
 -You can also download the result in the directory you wish
 
 
 ## Project Structure
+```
 PyQt-Modelica-Simulator/
 ├── model/                          # Model-related files and executables
 │   ├── executables/                # Contains compiled OpenModelica executables
@@ -86,6 +91,7 @@ PyQt-Modelica-Simulator/
 │   └── utils/                      # Utility functions and helper modules
 │
 └── requirements.txt                # Python package dependencies
+```
 
 ## Development
 
