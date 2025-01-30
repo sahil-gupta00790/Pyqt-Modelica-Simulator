@@ -37,18 +37,18 @@ A Python based desktop application for executing Openmodelica simulations. This 
 
 ## Installation
 
-### 1.Install Openmodelica
+### 1. Install Openmodelica
 
 Download from https://openmodelica.org/
 
-### 2.Clone the repository
+### 2. Clone the repository
 
 ```bash
 git clone https://github.com/sahil-gupta00790/Pyqt-Modelica-Simulator
 cd Pyqt-Modelica-Simulator
 ```
 
-### 3.Install the dependencies
+### 3. Install the dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -58,13 +58,13 @@ pip install -r requirements.txt
 
 ## Running the Application
 
-### 1.Launch the application
+### 1. Launch the application
 
 ```bash
 python main.py
 ```
 
-### 2.Using the interface 
+### 2. Using the interface 
 -Click "Browse" to select your OpenModelica Executable, or choose the inbuilt TwoConnectedTanks model by checking the default button 
 
 -Enter Start and Stop Time(0<=Start time<Stop time<5>) 
@@ -101,20 +101,28 @@ This project follows PEP8 standards for Python code.
 ### OOP Implementation
 
 The application is built using Object-Oriented Programming Principles:
+
 -Encapsulation of GUI components
--Inheritance of widgets
--Reusebale code structure
+ 
+-Inheritance of widgets 
+
+-Reusebale code structure 
 
 ## TroubleShoting
 
 ### Common Issues
 
 1.OpenModelica Executable Not Found: 
+
 -Ensure the executable path is correct 
+
 -Check file permissions 
 
+
 2.Simulation Error 
+
 -Check for OpenModelica installlation 
+
 -Add Path to OpenModelica's bin to environment variables 
 
 ---
