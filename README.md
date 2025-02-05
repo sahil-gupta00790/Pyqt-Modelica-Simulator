@@ -108,7 +108,7 @@ The application is built using Object-Oriented Programming Principles:
 
 -Reusebale code structure 
 
-## TroubleShoting
+## TroubleShooting
 
 ### Common Issues
 
